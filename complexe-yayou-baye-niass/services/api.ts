@@ -23,4 +23,15 @@ api.interceptors.request.use(
   }
 );
 
+
+// Ajouter des méthodes spécifiques pour la newsletter et le formulaire de contact
+const newsletterAPI = {
+  subscribe: (email) => api.post('/newsletter/subscribe', { email }),
+};
+
+const contactAPI = {
+  submit: (formData) => api.post('/contact/submit', formData),
+};
+
+export { newsletterAPI, contactAPI };
 export default api;

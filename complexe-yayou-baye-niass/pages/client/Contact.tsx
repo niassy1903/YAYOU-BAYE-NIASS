@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import axios from 'axios';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -9,19 +10,24 @@ const Contact = () => {
     message: ''
   });
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulate API call
-    console.log('Form data:', formData);
-    setSubmitted(true);
-    setTimeout(() => {
+    try {
+      const response = await axios.post('https://yayou-baye-niass.onrender.com/api/contact/submit', formData);
+      setSubmitted(true);
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      setTimeout(() => {
         setSubmitted(false);
-        setFormData({ name: '', email: '', subject: '', message: '' });
-    }, 3000);
+      }, 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Erreur lors de l\'envoi du message.');
+      console.error('Erreur lors de l\'envoi du message:', err);
+    }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -79,11 +85,7 @@ const Contact = () => {
                 </div>
               </div>
 
-              <div className="mt-10">
-                <div className="rounded-lg overflow-hidden h-48 bg-indigo-800 flex items-center justify-center">
-                    <span className="text-indigo-300 text-sm">Carte Google Maps Placeholder</span>
-                </div>
-              </div>
+              
             </div>
 
             {/* Contact Form */}
@@ -147,7 +149,7 @@ const Contact = () => {
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3 border"
                     />
                     </div>
-
+                    {error && <p className="text-red-500 text-sm">{error}</p>}
                     <div>
                     <button
                         type="submit"

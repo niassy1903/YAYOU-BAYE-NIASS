@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 import { HashRouter, Routes, Route, Outlet, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { UserRole } from './types';
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, ArrowRight, Heart } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, ArrowRight, Heart, Menu } from 'lucide-react';
 
 // Layouts
 import Navbar from './components/Navbar';
@@ -24,6 +25,53 @@ import Users from './pages/admin/Users';
 import Orders from './pages/admin/Orders';
 import Promotions from './pages/admin/Promotions';
 import Settings from './pages/admin/Settings';
+
+// Composant Newsletter
+const NewsletterForm = () => {
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('https://yayou-baye-niass.onrender.com/api/newsletter/subscribe', { email });
+      setSubmitted(true);
+      setEmail('');
+      setTimeout(() => {
+        setSubmitted(false);
+      }, 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Erreur lors de l\'inscription à la newsletter.');
+      console.error('Erreur lors de l\'inscription à la newsletter:', err);
+    }
+  };
+
+  return (
+    <form className="space-y-2" onSubmit={handleSubmit}>
+      <input
+        type="email"
+        placeholder="Votre email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-indigo-500 text-sm text-white"
+        required
+      />
+      <button
+        type="submit"
+        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition-colors text-sm"
+      >
+        S'abonner
+      </button>
+      {submitted && (
+        <p className="text-green-400 text-xs mt-2">Inscription réussie !</p>
+      )}
+      {error && (
+        <p className="text-red-400 text-xs mt-2">{error}</p>
+      )}
+    </form>
+  );
+};
 
 const Footer = () => (
   <footer className="bg-gray-900 text-white pt-20 pb-10 border-t border-gray-800">
@@ -82,20 +130,11 @@ const Footer = () => (
            </ul>
         </div>
 
-        {/* Newsletter (Visual only) */}
+        {/* Newsletter */}
         <div>
            <h4 className="text-lg font-bold mb-6 text-white">Newsletter</h4>
            <p className="text-gray-400 text-sm mb-4">Recevez nos dernières offres et nouveautés.</p>
-           <form className="space-y-2" onSubmit={(e) => e.preventDefault()}>
-             <input 
-              type="email" 
-              placeholder="Votre email" 
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-indigo-500 text-sm text-white"
-             />
-             <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition-colors text-sm">
-               S'abonner
-             </button>
-           </form>
+           <NewsletterForm />
         </div>
       </div>
 
@@ -124,19 +163,30 @@ const ClientLayout = () => (
 
 const AdminLayout = () => {
   const { user, isAdmin } = useAuth();
-  
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   if (!user || !isAdmin) {
       return <Navigate to="/login" replace />;
   }
 
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
-      <AdminSidebar />
+      <AdminSidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
+
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="md:hidden bg-gray-900 text-white p-4 flex justify-between items-center">
-             <span className="font-bold">Admin Panel</span>
+        {/* Mobile Header for Admin */}
+        <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between md:hidden">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-lg text-gray-600 hover:bg-gray-100"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+          <span className="font-bold text-gray-900">Admin Panel</span>
+          <div className="w-10"></div> {/* Spacer for symmetry */}
         </header>
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 md:p-8">
           <Outlet />
         </main>
       </div>
@@ -173,7 +223,7 @@ const App = () => {
               <Route path="promotions" element={<Promotions />} />
               <Route path="settings" element={<Settings />} />
             </Route>
-            
+
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
