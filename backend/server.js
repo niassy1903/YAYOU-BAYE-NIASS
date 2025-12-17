@@ -7,6 +7,10 @@ const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/users'); // Ajoutez cette ligne
 const orderRoutes = require('./routes/orders');
 const promotionRoutes = require('./routes/promotions');
+const newsletterRoutes = require('./routes/newsletter');
+const contactRoutes = require('./routes/contact');
+
+
 
 const app = express();
 
@@ -20,6 +24,13 @@ app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes); // Ajoutez cette ligne
 app.use('/api/orders', orderRoutes);
 app.use('/api/promotions', promotionRoutes);
+app.use('/api/newsletter', newsletterRoutes); // Ajoutez cette ligne
+app.use('/api/contact', contactRoutes); // Ajoutez cette ligne
+
+
+
+
+
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 5000;
