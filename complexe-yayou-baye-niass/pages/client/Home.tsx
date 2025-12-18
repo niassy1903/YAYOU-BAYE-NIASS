@@ -9,19 +9,21 @@ import {
   ShoppingBag,
   TrendingUp,
   Sparkles,
-  Play,
   Flame,
-  Crown
+  Crown,
+  Plus
 } from 'lucide-react';
 import api from '../../services/api';
 import { Product } from '../../types';
 import ProductCard from '../../components/ProductCard';
+import { useCart } from '../../context/CartContext';
 
 const Home = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     setIsVisible(true);
@@ -56,19 +58,9 @@ const Home = () => {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-10px); }
     }
-    @keyframes pulse-glow {
-      0%, 100% { box-shadow: 0 0 20px rgba(79, 70, 229, 0.2); }
-      50% { box-shadow: 0 0 40px rgba(79, 70, 229, 0.5); }
-    }
-    @keyframes border-flow {
-      0% { border-color: rgba(99, 102, 241, 0.5); }
-      50% { border-color: rgba(236, 72, 153, 0.5); }
-      100% { border-color: rgba(99, 102, 241, 0.5); }
-    }
     .animate-scroll { animation: scroll 20s linear infinite; }
-    .animate-shine { animation: shine 3s infinite; }
+    .animate-shine { animation: shine 3.5s infinite; }
     .animate-float { animation: float 3s ease-in-out infinite; }
-    .animate-border-flow { animation: border-flow 4s linear infinite; }
     
     .fade-in-up {
       opacity: 0;
@@ -83,14 +75,22 @@ const Home = () => {
     .stagger-2 { transition-delay: 200ms; }
     .stagger-3 { transition-delay: 300ms; }
     .stagger-4 { transition-delay: 400ms; }
-    
-    .premium-card-overlay {
-      background: linear-gradient(180deg, rgba(15, 23, 42, 0) 0%, rgba(15, 23, 42, 0.9) 100%);
-    }
-    .glass-effect {
+
+    .premium-glass {
       background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .image-container-premium::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.4) 100%);
+      opacity: 0.6;
+      transition: opacity 0.5s;
+    }
+    .group:hover .image-container-premium::after {
+      opacity: 0.9;
     }
   `;
 
@@ -177,25 +177,23 @@ const Home = () => {
             <div key={i} className="flex items-center mx-12">
               <span className="text-white text-sm font-black tracking-[0.2em] uppercase opacity-80">YAYOU BAYE NIASS LUXURY</span>
               <span className="mx-12 text-indigo-500 font-bold">•</span>
-              <span className="text-white text-sm font-black tracking-[0.2em] uppercase opacity-80">SÉNÉGAL FASHION WEEK 2024</span>
+              <span className="text-white text-sm font-black tracking-[0.2em] uppercase opacity-80">SÉNÉGAL FASHION WEEK 2026</span>
               <span className="mx-12 text-indigo-500 font-bold">•</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* --- EXPLOSIVE NEW ARRIVALS SECTION --- */}
+      {/* --- EXPLOSIVE NEW ARRIVALS SECTION (Mise à jour pour clarté image) --- */}
       <section className="py-32 bg-[#020617] text-white relative overflow-hidden">
-        {/* Animated Background Blobs */}
-        <div className="absolute top-1/4 -right-20 w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-1/4 -left-20 w-[500px] h-[500px] bg-pink-600/20 rounded-full blur-[120px] animate-pulse animation-delay-2000" />
+        <div className="absolute top-1/4 -right-20 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-20 gap-8">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-24 gap-8">
             <div className={`max-w-2xl ${isVisible ? 'fade-in-up visible' : 'fade-in-up'}`}>
               <div className="flex items-center gap-3 mb-6">
                 <div className="h-[2px] w-12 bg-indigo-500"></div>
-                <span className="text-indigo-400 font-black tracking-[0.3em] uppercase text-sm">Drop Exclusif</span>
+                <span className="text-indigo-400 font-black tracking-[0.3em] uppercase text-sm">Drop Limité</span>
               </div>
               <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none mb-8">
                 NOUVEAUTÉS <br/>
@@ -204,15 +202,15 @@ const Home = () => {
                 </span>
               </h2>
               <p className="text-gray-400 text-lg leading-relaxed">
-                Notre atelier ne dort jamais. Voici les pièces qui vont faire tourner les têtes cette semaine. Chaque vêtement est une promesse d'unicité.
+                Des images claires, des détails nets. Découvrez notre sélection exclusive de la semaine, photographiée sous son meilleur jour.
               </p>
             </div>
             
             <Link 
               to="/products" 
-              className={`group flex items-center space-x-4 bg-white/5 hover:bg-white/10 px-8 py-4 rounded-2xl border border-white/10 transition-all ${isVisible ? 'fade-in-up visible stagger-1' : 'fade-in-up'}`}
+              className={`group flex items-center space-x-4 bg-white/5 hover:bg-white/10 px-10 py-5 rounded-2xl border border-white/10 transition-all ${isVisible ? 'fade-in-up visible stagger-1' : 'fade-in-up'}`}
             >
-              <span className="font-bold tracking-widest text-sm">VOIR TOUT LE CATALOGUE</span>
+              <span className="font-black tracking-widest text-xs">VOIR LE CATALOGUE</span>
               <div className="bg-indigo-500 p-2 rounded-lg group-hover:translate-x-2 transition-transform">
                 <ArrowRight className="w-5 h-5 text-white" />
               </div>
@@ -220,67 +218,77 @@ const Home = () => {
           </div>
 
           {loading ? (
-             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+             <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
                {[1,2,3,4].map(i => (
-                 <div key={i} className="h-[450px] bg-white/5 rounded-[2.5rem] animate-pulse"></div>
+                 <div key={i} className="aspect-[4/5] bg-white/5 rounded-[3rem] animate-pulse"></div>
                ))}
              </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
                 {newArrivals.map((product, idx) => (
                     <div 
                       key={product.id} 
-                      className={`group relative h-[500px] rounded-[2.5rem] overflow-hidden shadow-2xl hover:shadow-indigo-500/20 transition-all duration-700 hover:-translate-y-4 border border-white/5 hover:border-indigo-500/30 bg-[#0f172a] ${isVisible ? `fade-in-up visible stagger-${idx+1}` : 'fade-in-up'}`}
+                      className={`group relative aspect-[4/5] rounded-[3rem] overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] transition-all duration-700 hover:-translate-y-4 border border-white/5 bg-gray-900 ${isVisible ? `fade-in-up visible stagger-${idx+1}` : 'fade-in-up'}`}
                     >
-                        {/* Shimmer Effect */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-[-25deg] -translate-x-full group-hover:translate-x-full transition-all duration-1000"></div>
+                        {/* Image Layer - Optimized for clarity */}
+                        <div className="absolute inset-0 image-container-premium overflow-hidden">
+                           <img 
+                            src={product.image} 
+                            className="w-full h-full object-cover object-top transition-all duration-1000 group-hover:scale-105 group-hover:brightness-110" 
+                            alt={product.name} 
+                            style={{ filter: 'contrast(1.05) saturate(1.05)' }}
+                          />
+                        </div>
                         
-                        <img 
-                          src={product.image} 
-                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
-                          alt={product.name} 
-                        />
-                        
-                        {/* Overlay Gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-500"></div>
-                        
-                        {/* Content */}
-                        <div className="absolute inset-0 p-8 flex flex-col justify-end">
-                            <div className="space-y-4">
-                                <div className="flex justify-between items-center">
-                                    <span className="px-4 py-1.5 bg-indigo-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full flex items-center gap-1.5">
-                                      <Zap className="w-3 h-3" /> Nouveau
-                                    </span>
-                                    <span className="text-indigo-400 font-bold text-xs uppercase tracking-widest">{product.category}</span>
-                                </div>
+                        {/* Badges Overlay */}
+                        <div className="absolute top-6 left-6 z-20 flex flex-col gap-2">
+                            <div className="bg-indigo-500/90 backdrop-blur-md text-white text-[9px] font-black px-4 py-1.5 rounded-full shadow-lg flex items-center gap-2">
+                                <Zap className="w-3 h-3" /> NOUVEAU
+                            </div>
+                        </div>
+
+                        {/* Interactive UI Overlay */}
+                        <div className="absolute inset-0 p-8 flex flex-col justify-end z-20">
+                            <div className="space-y-5 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                                 
-                                <h3 className="text-2xl font-black text-white leading-tight transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                                  {product.name}
-                                </h3>
-                                
-                                <div className="flex items-center justify-between pt-4 border-t border-white/10 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-100">
-                                    <div>
-                                        <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Investissement</p>
-                                        <p className="text-xl font-black text-white">{product.price.toLocaleString()} FCFA</p>
+                                <div className="space-y-1">
+                                    <h3 className="text-2xl font-black text-white leading-tight drop-shadow-md">
+                                      {product.name}
+                                    </h3>
+                                    <div className="flex items-center justify-between">
+                                      <p className="text-indigo-400 font-bold text-xs uppercase tracking-widest">{product.category}</p>
+                                      <p className="text-xl font-black text-white tracking-tighter">{product.price.toLocaleString()} FCFA</p>
                                     </div>
+                                </div>
+
+                                <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
                                     <button 
-                                      className="bg-white text-[#020617] p-4 rounded-2xl hover:bg-indigo-500 hover:text-white transition-all transform active:scale-95"
-                                      onClick={() => {/* addToCart(product) */}}
+                                      onClick={() => addToCart(product)}
+                                      className="flex-1 bg-white text-gray-900 py-4 rounded-2xl font-black text-[10px] uppercase tracking-tighter hover:bg-indigo-600 hover:text-white transition-all flex items-center justify-center gap-2"
                                     >
-                                      <ShoppingBag className="w-6 h-6" />
+                                      <Plus className="w-4 h-4" /> Panier
                                     </button>
+                                    <Link 
+                                      to={`/products/${product.id}`}
+                                      className="p-4 bg-white/10 backdrop-blur-md text-white rounded-2xl border border-white/20 hover:bg-white hover:text-gray-900 transition-all"
+                                    >
+                                      <ArrowRight className="w-5 h-5" />
+                                    </Link>
                                 </div>
                             </div>
                         </div>
+
+                        {/* Glossy Reflection Effect */}
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-20 pointer-events-none bg-gradient-to-br from-white/40 via-transparent to-transparent"></div>
                     </div>
                 ))}
             </div>
           )}
           
-          <div className="mt-24 text-center">
+          <div className="mt-28 text-center">
             <div className="inline-flex flex-col items-center">
-                <p className="text-indigo-400 font-bold text-sm tracking-[0.2em] uppercase mb-8">Défilez pour découvrir la suite</p>
-                <div className="w-[2px] h-20 bg-gradient-to-b from-indigo-500 to-transparent"></div>
+                <p className="text-indigo-400 font-bold text-xs tracking-[0.3em] uppercase mb-8 opacity-60">Faites défiler pour la collection complète</p>
+                <div className="w-[1px] h-24 bg-gradient-to-b from-indigo-500 to-transparent"></div>
             </div>
           </div>
         </div>
@@ -331,7 +339,7 @@ const Home = () => {
 
       {/* --- PROMO BANNER --- */}
       <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto rounded-[4rem] bg-gray-950 overflow-hidden relative group">
+        <div className="max-w-7xl auto rounded-[4rem] bg-gray-950 overflow-hidden relative group">
           <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] group-hover:scale-110 transition-transform duration-2000"></div>
           
           <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 items-center">
